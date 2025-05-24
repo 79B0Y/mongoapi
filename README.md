@@ -181,7 +181,7 @@ server:
 | 项目           | 值                          |
 |----------------|-----------------------------|
 | HTTP Method    | `POST`                      |
-| URL            | `http://localhost:8080/upsert` |
+| URL            | `http://localhost:8088/upsert` |
 | Content-Type   | `application/json`          |
 | Body Parameters（JSON） |                      |
 
