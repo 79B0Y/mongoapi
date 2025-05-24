@@ -155,3 +155,97 @@ server:
 ## 📞 支持
 
 如需功能拓展或部署帮助，请联系作者或项目维护团队。
+
+## 🌐 在 n8n 中使用 mongoapi 接口
+
+你可以通过 n8n 的 `HTTP Request` 节点调用本服务实现 MongoDB 的远程操作。
+
+---
+
+### ✅ 通用设置（所有接口）
+
+- **Method**: `POST`
+- **URL**: `http://localhost:8080/<接口路径>`
+- **Content-Type**: `application/json`
+- **Response Format**: `JSON`
+
+---
+
+### 📥 示例：Upsert 操作
+
+**接口路径**：`/upsert`  
+**目标**：更新或插入设备信息
+
+#### 📄 HTTP Request 节点配置：
+
+| 项目           | 值                          |
+|----------------|-----------------------------|
+| HTTP Method    | `POST`                      |
+| URL            | `http://localhost:8080/upsert` |
+| Content-Type   | `application/json`          |
+| Body Parameters（JSON） |                      |
+
+```json
+{
+  "database": "test",
+  "collection": "devices",
+  "filter": {
+    "did": "{{ $json.did }}"
+  },
+  "update": {
+    "name": "{{ $json.name }}",
+    "status": "{{ $json.status }}",
+    "timestamp": "{{ $json.timestamp }}"
+  }
+}
+```
+
+---
+
+### 📥 示例：Find 查询
+
+**接口路径**：`/find`  
+**目标**：查询指定条件下的用户信息
+
+#### 📄 HTTP Request 配置：
+
+```json
+{
+  "database": "test",
+  "collection": "users",
+  "query": {
+    "status": "active"
+  },
+  "projection": {
+    "_id": 0,
+    "name": 1,
+    "email": 1
+  }
+}
+```
+
+---
+
+### 🧠 小技巧（动态字段）
+
+你可以结合前置节点（如 Set、Function）设置动态 JSON，例如：
+
+```js
+{
+  "did": "device-123",
+  "name": "温湿度传感器",
+  "status": "online",
+  "timestamp": {{ new Date().getTime() }}
+}
+```
+
+---
+
+### 🛡️ 安全建议
+
+- 建议添加 API Key Header（可拓展）
+- 可将服务部署于内网 + VPN，防止公网滥用
+
+---
+
+如需我生成可导入的 n8n 流程 `.json` 文件，也可以继续告诉我。
