@@ -84,27 +84,7 @@ logging:
   "projection": { "name": 1, "_id": 0 }
 }
 ```
-✅ 示例：字段的区间查询，你可以使用查询运算符如：
 
-操作符	含义
-$gt	大于
-$gte	大于等于
-$lt	小于
-$lte	小于等于
-
-查询 age 在 18 到 30 之间的用户
-```json
-{
-  "database": "test",
-  "collection": "users",
-  "query": {
-    "age": {
-      "$gte": 18,
-      "$lt": 60
-    }
-  }
-}
-```
 ---
 
 ### 3. 更新文档 `/update`
@@ -162,32 +142,16 @@ $lte	小于等于
 ### 7. 查询 API 状态 `/status` ✅
 
 - 请求方式：`GET`
-- 返回结构：
+- 返回结构如下：
 
 ```json
 {
+  "service_name": "mongoapi",
   "connected": true,
   "uri": "mongodb://localhost:27017",
   "databases": {
     "test": ["users", "devices"],
     "admin": ["system.version"]
-  }
-}
-```
-
----
-
-## 🧾 所有接口统一返回结构
-
-```json
-{
-  "result": { ...接口具体返回... },
-  "status": {
-    "connected": true,
-    "uri": "mongodb://localhost:27017",
-    "databases": {
-      "test": ["users", "devices"]
-    }
   }
 }
 ```
