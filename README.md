@@ -9,7 +9,7 @@
 ## 📁 项目结构
 
 ```
-mongoapi_cli/
+mongoapi/
 ├── mongoapi/
 │   ├── main.py              # 主服务入口
 │   ├── config_loader.py     # 加载 configuration.yaml
@@ -26,8 +26,8 @@ mongoapi_cli/
 ### 1. 解压安装
 
 ```bash
-unzip mongoapi_cli.zip
-cd mongoapi_cli
+unzip mongoapi_status.zip
+cd mongoapi_status
 pip install .
 ```
 
@@ -58,7 +58,9 @@ logging:
 
 ## 🔌 API 接口文档
 
-所有接口均使用 `application/json` 格式，请求方式为 `POST`。
+所有接口均使用 `application/json` 格式，请求方式为 `POST`（除 `/status`）。
+
+---
 
 ### 1. 插入文档 `/insert`
 
@@ -137,113 +139,71 @@ logging:
 
 ---
 
-## 🆕 日志与状态功能说明（v0.3+）
+### 7. 查询 API 状态 `/status` ✅
 
-### ✅ 配置日志输出
+- 请求方式：`GET`
+- 返回结构：
 
-在 `configuration.yaml` 中启用日志功能：
+```json
+{
+  "connected": true,
+  "uri": "mongodb://localhost:27017",
+  "databases": {
+    "test": ["users", "devices"],
+    "admin": ["system.version"]
+  }
+}
+```
 
+---
+
+## 🧾 所有接口统一返回结构
+
+```json
+{
+  "result": { ...接口具体返回... },
+  "status": {
+    "connected": true,
+    "uri": "mongodb://localhost:27017",
+    "databases": {
+      "test": ["users", "devices"]
+    }
+  }
+}
+```
+
+---
+
+## 📋 日志记录说明
+
+- 控制开关位于 `configuration.yaml` 中：
 ```yaml
 logging:
   enabled: true
   file: "mongoapi.log"
 ```
 
-- `enabled`: 是否启用日志记录
-- `file`: 日志文件路径，默认写入 `mongoapi.log`
-
----
-
-### 📋 日志记录内容
-
-| 场景               | 日志内容示例                                   |
-|--------------------|-------------------------------------------------|
-| 启动服务时         | MongoDB 连接地址、数据库列表                    |
-| 插入数据后         | 再次列出当前数据库结构                          |
-| 执行任何操作       | 写入执行日志标记，例如 `"Insert operation executed."` |
-
----
-
-### 🧾 HTTP API 响应结构增强
-
-每个接口返回增加 `status` 字段，内容示例：
-
-```json
-{
-  "result": { ...具体操作结果... },
-  "status": {
-    "connected": true,
-    "uri": "mongodb://localhost:27017",
-    "databases": {
-      "test": ["devices", "users"],
-      "admin": ["system.version"]
-    }
-  }
-}
-```
-
-此结构有助于：
-
-- ✅ 客户端判断数据库连接状态
-- ✅ 展示当前数据库与集合结构
-- ✅ 故障诊断时辅助排查
-
----
-
-## 🔐 安全建议
-
-- ✅ 加入 API Key 或 Token 认证
-- ✅ 限制允许访问的 database 和 collection
-- ✅ 日志审计与速率限制（可拓展）
-
----
-
-## 🛠️ 未来可拓展功能
-
-- [ ] systemd 后台服务支持
-- [ ] Docker 镜像
-- [ ] 数据导出/导入接口
-- [ ] WebSocket 实时推送
-- [ ] 自动化注册 Swagger 文档
+- 日志记录内容：
+  - 启动时记录 MongoDB 连接与数据库列表
+  - 插入后记录数据库状态
+  - 所有操作记录执行标识和时间戳
 
 ---
 
 ## 🌐 在 n8n 中使用 mongoapi 接口
 
-你可以通过 n8n 的 `HTTP Request` 节点调用本服务实现 MongoDB 的远程操作。
+- 节点类型：HTTP Request
+- Method：POST
+- URL：如 `http://localhost:8080/upsert`
+- Headers：Content-Type = application/json
 
----
-
-### ✅ 通用设置（所有接口）
-
-- **Method**: `POST`
-- **URL**: `http://localhost:8080/<接口路径>`
-- **Content-Type**: `application/json`
-- **Response Format**: `JSON`
-
----
-
-### 📥 示例：Upsert 操作
-
-**接口路径**：`/upsert`  
-**目标**：更新或插入设备信息
-
-#### 📄 HTTP Request 节点配置：
-
-| 项目           | 值                          |
-|----------------|-----------------------------|
-| HTTP Method    | `POST`                      |
-| URL            | `http://localhost:8080/upsert` |
-| Content-Type   | `application/json`          |
-| Body Parameters（JSON） |                      |
+### 示例 Upsert 请求体：
 
 ```json
 {
   "database": "test",
   "collection": "devices",
-  "filter": {
-    "did": "{{ $json.did }}"
-  },
+  "filter": { "did": "{{ $json.did }}" },
   "update": {
     "name": "{{ $json.name }}",
     "status": "{{ $json.status }}",
@@ -254,50 +214,10 @@ logging:
 
 ---
 
-### 📥 示例：Find 查询
+## 🛠️ 可拓展方向
 
-**接口路径**：`/find`  
-**目标**：查询指定条件下的用户信息
-
-#### 📄 HTTP Request 配置：
-
-```json
-{
-  "database": "test",
-  "collection": "users",
-  "query": {
-    "status": "active"
-  },
-  "projection": {
-    "_id": 0,
-    "name": 1,
-    "email": 1
-  }
-}
-```
-
----
-
-### 🧠 小技巧（动态字段）
-
-你可以结合前置节点（如 Set、Function）设置动态 JSON，例如：
-
-```js
-{
-  "did": "device-123",
-  "name": "温湿度传感器",
-  "status": "online",
-  "timestamp": {{ new Date().getTime() }}
-}
-```
-
----
-
-### 🛡️ 安全建议
-
-- 建议添加 API Key Header（可拓展）
-- 可将服务部署于内网 + VPN，防止公网滥用
-
----
-
-如需我生成可导入的 n8n 流程 `.json` 文件，也可以继续告诉我。
+- ✅ API Key 权限控制
+- ✅ systemd 后台服务
+- ✅ Docker 镜像打包
+- ✅ 自动 Swagger 文档生成
+- ✅ MongoDB 操作审计与告警
