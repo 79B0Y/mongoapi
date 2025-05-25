@@ -84,7 +84,19 @@ logging:
   "projection": { "name": 1, "_id": 0 }
 }
 ```
-
+✅ 示例：查询 age 在 18 到 30 之间的用户, MongoDB HTTP API 中使用示例（如 POST /find）
+```json
+{
+  "database": "test",
+  "collection": "users",
+  "query": {
+    "age": {
+      "$gte": 18,
+      "$lt": 60
+    }
+  }
+}
+```
 ---
 
 ### 3. 更新文档 `/update`
