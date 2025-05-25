@@ -84,8 +84,28 @@ logging:
   "projection": { "name": 1, "_id": 0 }
 }
 ```
+示例：字段的区间查询，你可以使用查询运算符如：
 
+操作符	含义
+$gt	大于
+$gte	大于等于
+$lt	小于
+$lte	小于等于
 ---
+✅ 示例：查询 age 在 18 到 30 之间的用户
+{
+  "database": "test",
+  "collection": "users",
+  "query": {
+    "age": {
+      "$gte": 18,
+      "$lt": 60
+    }
+  }
+}
+
+
+
 
 ### 3. 更新文档 `/update`
 
