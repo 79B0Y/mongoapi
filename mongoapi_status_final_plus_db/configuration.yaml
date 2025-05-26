@@ -1,0 +1,8 @@
+mongodb:
+  uri: "mongodb://localhost:27017"
+server:
+  host: "0.0.0.0"
+  port: 8080
+logging:
+  enabled: true
+  file: "mongoapi.log"
