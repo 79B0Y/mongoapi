@@ -1,4 +1,4 @@
-### MongoAPI Assistant 提示词记录整理
+### MongoAPI Assistant 原始提示词记录整理
 
 #### 🧩 功能扩展请求
 - 我需要一个应用来完成这个，包括通过 configuration.yaml 来配置 MongoDB
@@ -44,6 +44,66 @@
 #### 🧠 设计与建议
 - 所有接口是否都应该返回 status？（答：不需要）
 - `/status` 接口是否需要 service_name 字段？（答：需要）
+
+###优化后的提示词
+
+### MongoAPI 项目提示词（按阶段整理）
+
+将提示词分为“需求分析 ➝ 功能开发 ➝ 部署配置 ➝ 文档编写 ➝ 问题排查”5 个阶段，以便更清晰表达开发意图。
+
+---
+
+## 🧭 阶段 1：需求分析
+
+- 我需要一个 HTTP 接口应用，封装 MongoDB 的核心功能（insert/find/update/delete...）
+- 这个程序需要通过 configuration.yaml 配置 MongoDB 地址、服务端口、日志文件
+- 程序要能用命令 `mongoapi` 启动运行
+- 我希望在 n8n 或远程设备中通过 HTTP 操作 MongoDB
+
+---
+
+## 🛠️ 阶段 2：功能开发请求
+
+- 请实现 insert、find、update、delete、upsert、aggregate 等接口
+- 请新增 `/status` 接口，用于查询连接状态、数据库结构、Mongo URI
+- 请添加 `/create_database` 接口，主动创建数据库和集合
+- 是否能统一接口响应格式，返回 result + status 信息？（改为只在 `/status` 中返回）
+- 程序中增加日志控制开关，可记录连接事件、操作行为、错误信息
+
+---
+
+## 🚀 阶段 3：部署配置需求
+
+- 请提供一份 Ubuntu 系统安装脚本，支持 systemd 开机自启
+- 安装脚本应创建虚拟环境、安装依赖、生成服务文件并启动服务
+- 日志文件需要加入 logrotate，每周轮转并压缩
+- 请打包为 zip 文件，包含全部源代码、配置、install.sh 脚本
+
+---
+
+## 📄 阶段 4：文档生成请求
+
+- 请用 markdown 生成完整文档，包含以下部分：
+  - 项目简介
+  - 项目结构说明
+  - 安装与使用
+  - configuration.yaml 字段说明
+  - 日志查看方式
+  - 所有 HTTP API 接口说明
+  - 示例 curl 与 n8n 配置
+- 是否能导出为 PDF 或 HTML 文档？
+
+---
+
+## 🧪 阶段 5：运行问题排查
+
+- curl 调用 `/create_database` 报错 500，请帮我添加异常捕获并返回错误信息 JSON
+- 如何确认 MongoAPI 服务是否运行？在哪查看日志？
+- 如果遇到依赖无法安装，如何使用国内源？
+
+---
+
+> 该结构便于你后续快速调用不同阶段的功能请求，并利于多项目共用类似提示模版
 
 ---
 
